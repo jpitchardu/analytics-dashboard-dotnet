@@ -26,25 +26,16 @@ clean:
 	@find . -name "bin" -type d -exec rm -rf {} + 2>/dev/null || true
 	@find . -name "obj" -type d -exec rm -rf {} + 2>/dev/null || true
 
-# Build all projects - let dotnet handle parallelism and dependencies
-build-projects:
-	@echo "🔨 Building all projects (dotnet manages parallelism)..."
-	@dotnet build --no-restore --configuration Release
 
-# Build test projects - let dotnet handle parallelism and dependencies  
-build-tests:
-	@echo "🔨 Building test projects (dotnet manages parallelism)..."
+
+build-solution:
+	@echo "🔨 Building solution..."
 	@dotnet build --no-restore --configuration Release
 
 # Run tests with proper failure detection
 test:
 	@echo "🧪 Running tests..."
-	@echo "  → Core tests..."
-	@dotnet test AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-build --configuration Release --verbosity minimal
-	@echo "  → Infrastructure tests..."
-	@dotnet test AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-build --configuration Release --verbosity minimal
-	@echo "  → API tests..."
-	@dotnet test AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-build --configuration Release --verbosity minimal
+	@dotnet test --configuration Release --verbosity minimal
 	@echo "✅ All tests passed!"
 
 # Run tests with coverage
@@ -53,7 +44,7 @@ test-coverage:
 	@dotnet test --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
 # Full CI pipeline
-ci: clean restore build-projects build-tests test
+ci: clean restore build-solution test
 	@echo "✅ All builds and tests completed successfully!"
 
 # Pre-push validation (what you want!)
@@ -71,4 +62,4 @@ quick-check:
 	@dotnet test --configuration Debug --verbosity minimal --no-build
 
 
-.PHONY: start stop logs rebuild reset restore clean build-projects build-tests test test-coverage ci pre-push watch quick-check
+.PHONY: start stop logs rebuild reset restore clean build-solution test test-coverage ci pre-push watch quick-check
