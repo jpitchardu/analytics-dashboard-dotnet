@@ -26,29 +26,30 @@ clean:
 	@find . -name "bin" -type d -exec rm -rf {} + 2>/dev/null || true
 	@find . -name "obj" -type d -exec rm -rf {} + 2>/dev/null || true
 
-# Build individual projects in parallel
+# Build individual projects with proper dependency order
 build-projects:
-	@echo "🔨 Building all projects in parallel..."
-	@(dotnet build AnalyticsDashboard.Core/AnalyticsDashboard.Core.csproj --no-restore --configuration Release) & \
-	(dotnet build AnalyticsDashboard.Infrastructure/AnalyticsDashboard.Infrastructure.csproj --no-restore --configuration Release) & \
-	(dotnet build AnalyticsDashboard.Api/AnalyticsDashboard.Api.csproj --no-restore --configuration Release) & \
-	wait
+	@echo "🔨 Building projects in dependency order..."
+	@dotnet build AnalyticsDashboard.Core/AnalyticsDashboard.Core.csproj --no-restore --configuration Release
+	@dotnet build AnalyticsDashboard.Infrastructure/AnalyticsDashboard.Infrastructure.csproj --no-restore --configuration Release
+	@dotnet build AnalyticsDashboard.Api/AnalyticsDashboard.Api.csproj --no-restore --configuration Release
 
-# Build test projects in parallel  
+# Build test projects with proper dependency order
 build-tests:
-	@echo "🔨 Building test projects in parallel..."
-	@(dotnet build AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-restore --configuration Release) & \
-	(dotnet build AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-restore --configuration Release) & \
-	(dotnet build AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-restore --configuration Release) & \
-	wait
+	@echo "🔨 Building test projects in dependency order..."
+	@dotnet build AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-restore --configuration Release
+	@dotnet build AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-restore --configuration Release
+	@dotnet build AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-restore --configuration Release
 
-# Run tests in parallel
+# Run tests with proper failure detection
 test:
-	@echo "🧪 Running tests in parallel..."
-	@(dotnet test AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-build --configuration Release --verbosity minimal) & \
-	(dotnet test AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-build --configuration Release --verbosity minimal) & \
-	(dotnet test AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-build --configuration Release --verbosity minimal) & \
-	wait
+	@echo "🧪 Running tests..."
+	@echo "  → Core tests..."
+	@dotnet test AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-build --configuration Release --verbosity minimal
+	@echo "  → Infrastructure tests..."
+	@dotnet test AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-build --configuration Release --verbosity minimal
+	@echo "  → API tests..."
+	@dotnet test AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-build --configuration Release --verbosity minimal
+	@echo "✅ All tests passed!"
 
 # Run tests with coverage
 test-coverage:
