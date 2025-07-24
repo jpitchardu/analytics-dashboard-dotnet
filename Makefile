@@ -26,19 +26,15 @@ clean:
 	@find . -name "bin" -type d -exec rm -rf {} + 2>/dev/null || true
 	@find . -name "obj" -type d -exec rm -rf {} + 2>/dev/null || true
 
-# Build individual projects with proper dependency order
+# Build all projects - let dotnet handle parallelism and dependencies
 build-projects:
-	@echo "🔨 Building projects in dependency order..."
-	@dotnet build AnalyticsDashboard.Core/AnalyticsDashboard.Core.csproj --no-restore --configuration Release
-	@dotnet build AnalyticsDashboard.Infrastructure/AnalyticsDashboard.Infrastructure.csproj --no-restore --configuration Release
-	@dotnet build AnalyticsDashboard.Api/AnalyticsDashboard.Api.csproj --no-restore --configuration Release
+	@echo "🔨 Building all projects (dotnet manages parallelism)..."
+	@dotnet build --no-restore --configuration Release
 
-# Build test projects with proper dependency order
+# Build test projects - let dotnet handle parallelism and dependencies  
 build-tests:
-	@echo "🔨 Building test projects in dependency order..."
-	@dotnet build AnalyticsDashboard.Core.Tests/AnalyticsDashboard.Core.Tests.csproj --no-restore --configuration Release
-	@dotnet build AnalyticsDashboard.Infrastructure.Tests/AnalyticsDashboard.Infrastructure.Tests.csproj --no-restore --configuration Release
-	@dotnet build AnalyticsDashboard.Api.Tests/AnalyticsDashboard.Api.Tests.csproj --no-restore --configuration Release
+	@echo "🔨 Building test projects (dotnet manages parallelism)..."
+	@dotnet build --no-restore --configuration Release
 
 # Run tests with proper failure detection
 test:
