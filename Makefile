@@ -73,4 +73,5 @@ quick-check:
 	@dotnet build --configuration Debug --verbosity minimal
 	@dotnet test --configuration Debug --verbosity minimal --no-build
 
+
 .PHONY: start stop logs rebuild reset restore clean build-projects build-tests test test-coverage ci pre-push watch quick-check
