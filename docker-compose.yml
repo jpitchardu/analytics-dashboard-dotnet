@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: analytics_user
+      POSTGRES_PASSWORD: dev_password_123
+      POSTGRES_DB: analytics_dashboard
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - analytics-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: analytics_redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - analytics-network
+
+  api:
+    build:
+      context: .
+      dockerfile:  AnalyticsDashboard.Api/Dockerfile
+    container_name: analytics_api
+    ports:
+      - 5000:8080
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - analytics-network
+    volumes:
+      - .:/app/source
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: analytics_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@analytics.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - 8080:80
+    depends_on:
+      - postgres
+    networks:
+      - analytics-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  analytics-network:
+    driver: bridge
